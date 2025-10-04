@@ -28,7 +28,7 @@ class AuthController {
                         header("Location: index.php?page=empleados&action=index");
                         exit;
                     case "Recepcionista":
-                        header("Location: index.php?page=reparaciones&action=index");
+                        header("Location: index.php?page=celulares&action=index");
                         exit;
                     case "Tecnico":
                         header("Location: index.php?page=tecnico&action=index");
