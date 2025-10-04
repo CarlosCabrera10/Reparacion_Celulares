@@ -1,3 +1,5 @@
+<?php include __DIR__ . "/../layout/menu.php"; ?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
