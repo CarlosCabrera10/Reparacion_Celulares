@@ -43,8 +43,7 @@
                                 <td class="text-center">
                                     <a href="index.php?page=clientes&action=editar&id=<?= $c->getId(); ?>" 
                                        class="btn btn-warning btn-sm me-1">✏️ Editar</a>
-                                    <a href="index.php?page=clientes&action=eliminar&id=<?= $c->getId(); ?>" 
-                                       class="btn btn-danger btn-sm" onclick="return confirm('¿Seguro que desea eliminar este cliente?')">🗑️ Eliminar</a>
+                                   
                                 </td>
                             </tr>
                         <?php endforeach; ?>

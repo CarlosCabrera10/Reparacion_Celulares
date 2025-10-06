@@ -9,12 +9,12 @@
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
-        <span class="navbar-brand">🔧 Taller de Reparación - Editar Reparación</span>
-        <div class="d-flex">
+            <span class="navbar-brand">🔧 Taller de Reparación - Editar Reparación</span>
+            <div class="d-flex">
             <span class="navbar-text text-white me-3">👋 Bienvenido, <?= htmlspecialchars($_SESSION["usuario_nombre"] ?? "Técnico") ?></span>
             <a href="index.php?page=tecnico" class="btn btn-outline-light btn-sm me-2">← Volver</a>
-            <a href="index.php?page=auth&action=logout" class="btn btn-outline-light btn-sm">Cerrar sesión</a>
-        </div>
+                <a href="index.php?page=auth&action=logout" class="btn btn-outline-light btn-sm">Cerrar sesión</a>
+            </div>
     </div>
 </nav>
 
@@ -42,7 +42,7 @@
                         <?php unset($_SESSION['error']); ?>
                     <?php endif; ?>
                     
-                    <form method="POST" action="index.php?page=tecnico&action=actualizar">
+                    <form method="POST" action="<?= $action_url ?? 'index.php?page=tecnico&action=actualizar' ?>">
                         <input type="hidden" name="id_reparacion" value="<?= $reparacion->getId() ?>">
                         
                         <div class="row mb-3">
@@ -100,7 +100,7 @@
                         <?php endif; ?>
 
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <a href="index.php?page=tecnico" class="btn btn-secondary me-md-2">
+                            <a href="<?= $back_url ?? 'index.php?page=tecnico' ?>" class="btn btn-secondary me-md-2">
                                 <i class="bi bi-arrow-left"></i> Cancelar
                             </a>
                             <button type="submit" class="btn btn-primary">

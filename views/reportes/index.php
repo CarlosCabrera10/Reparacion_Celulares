@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . "/../layout/menu.php";
 
+
 // Asegúrate de que $reparacionesMes, $reparacionesTecnico y $reparacionesMarca
 // vienen desde tu ReportesController
 ?>
@@ -15,6 +16,7 @@ require_once __DIR__ . "/../layout/menu.php";
                 <div class="card-body">
                     <h5>Reparaciones por mes</h5>
                     <canvas id="graficoMes"></canvas>
+                    <a href="index.php?page=reportes&action=generarMes" class="btn btn-primary mt-2">Generar PDF</a>
                 </div>
             </div>
         </div>
@@ -25,6 +27,7 @@ require_once __DIR__ . "/../layout/menu.php";
                 <div class="card-body">
                     <h5>Reparaciones por técnico</h5>
                     <canvas id="graficoTecnico"></canvas>
+                    <a href="index.php?page=reportes&action=generarTecnico" class="btn btn-primary mt-2">Generar PDF</a>
                 </div>
             </div>
         </div>
@@ -35,6 +38,7 @@ require_once __DIR__ . "/../layout/menu.php";
                 <div class="card-body">
                     <h5>Reparaciones por marca</h5>
                     <canvas id="graficoMarca"></canvas>
+                    <a href="index.php?page=reportes&action=generarMarca" class="btn btn-primary mt-2">Generar PDF</a>
                 </div>
             </div>
         </div>
@@ -49,7 +53,7 @@ const reparacionesMes = <?= json_encode($reparacionesMes) ?>;
 const reparacionesTecnico = <?= json_encode($reparacionesTecnico) ?>;
 const reparacionesMarca = <?= json_encode($reparacionesMarca) ?>;
 
-// 🟦 Reparaciones por mes (barras apiladas)
+// Reparaciones por mes 
 new Chart(document.getElementById('graficoMes'), {
     type: 'bar',
     data: {
@@ -68,7 +72,7 @@ new Chart(document.getElementById('graficoMes'), {
     }
 });
 
-// 👨‍🔧 Reparaciones por técnico (barras + línea de tiempo promedio)
+//  Reparaciones por técnico 
 new Chart(document.getElementById('graficoTecnico'), {
     data: {
         labels: reparacionesTecnico.map(r => r.tecnico),
@@ -87,7 +91,7 @@ new Chart(document.getElementById('graficoTecnico'), {
     }
 });
 
-// 📱 Reparaciones por marca (Pastel)
+// Reparaciones por marca 
 new Chart(document.getElementById('graficoMarca'), {
     type: 'pie',
     data: {

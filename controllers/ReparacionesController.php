@@ -1,5 +1,9 @@
 <?php
 require_once __DIR__ . "/../models/ReparacionesModel.php";
+require_once __DIR__ . "/../models/DiagnosticosModel.php";
+require_once __DIR__ . "/../models/CelularesModel.php";
+require_once __DIR__ . "/../models/ClientesModel.php";
+require_once __DIR__ . "/../models/EmpleadoModel.php";
 require_once __DIR__ . "/../clases/Reparacion.php";
 
 class ReparacionesController {
@@ -9,157 +13,124 @@ class ReparacionesController {
         $this->model = new ReparacionesModel();
     }
 
-    // 📋 Panel principal de reparaciones (para admin y recepcionista)
     public function index() {
-        // Verificar sesión de administrador o recepcionista
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-        if (!isset($_SESSION["usuario_cargo"]) || 
-            ($_SESSION["usuario_cargo"] !== "Administrador" && $_SESSION["usuario_cargo"] !== "Recepcionista")) {
-            header("Location: index.php?page=auth&action=login");
-            exit;
-        }
-
-        $reparaciones = $this->model->obtenerTodas();
-        require "views/reparaciones/index.php";
+        $reparaciones = $this->model->obtenerTodos();
+        include __DIR__ . "/../views/empleados/reparaciones.php";
     }
 
-    // 👁️ Ver detalles de una reparación
-    public function ver() {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-        if (!isset($_SESSION["usuario_cargo"]) || 
-            ($_SESSION["usuario_cargo"] !== "Administrador" && $_SESSION["usuario_cargo"] !== "Recepcionista")) {
-            header("Location: index.php?page=auth&action=login");
-            exit;
-        }
-
-        $id = $_GET['id'] ?? null;
-        if ($id) {
-            $reparacion = $this->model->obtenerReparacionCompleta($id);
-            require "views/reparaciones/ver.php";
-        } else {
-            header("Location: index.php?page=reparaciones");
-            exit;
-        }
-    }
-
-    // ✏️ Editar reparación (solo administradores pueden editar)
-    public function editar() {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-        // Solo administradores pueden editar reparaciones
-        if (!isset($_SESSION["usuario_cargo"]) || $_SESSION["usuario_cargo"] !== "Administrador") {
-            header("Location: index.php?page=auth&action=login");
-            exit;
-        }
-
-        $id = $_GET["id"] ?? null;
-        if (!$id) {
-            header("Location: index.php?page=reparaciones");
-            exit;
-        }
-
-        if ($_SERVER["REQUEST_METHOD"] === "POST") {
-            $reparacion = new Reparacion(
-                $id,
-                $_POST["id_diagnostico"],
-                $_POST["fecha_ingreso"],
-                $_POST["fecha_entrega"] ?: null,
-                $_POST["estado"],
-                $_POST["diagnostico"],
-                $_POST["costo"] ?: null
-            );
-
-            if ($this->model->actualizar($reparacion)) {
-                $_SESSION['mensaje'] = "Reparación actualizada exitosamente";
-            } else {
-                $_SESSION['error'] = "Error al actualizar la reparación";
-            }
-            
-            header("Location: index.php?page=reparaciones");
-            exit;
-        }
-
-        $reparacion = $this->model->obtenerReparacionCompleta($id);
-        require "views/reparaciones/editar.php";
-    }
-
-    // ➕ Crear nueva reparación (admin y recepcionista)
     public function crear() {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-        if (!isset($_SESSION["usuario_cargo"]) || 
-            ($_SESSION["usuario_cargo"] !== "Administrador" && $_SESSION["usuario_cargo"] !== "Recepcionista")) {
-            header("Location: index.php?page=auth&action=login");
-            exit;
-        }
 
-        if ($_SERVER["REQUEST_METHOD"] === "POST") {
-            $reparacion = new Reparacion(
-                null,
-                $_POST["id_diagnostico"],
-                $_POST["fecha_ingreso"],
-                $_POST["fecha_entrega"] ?: null,
-                $_POST["estado"],
-                $_POST["diagnostico"],
-                $_POST["costo"] ?: null
-            );
-
-            if ($this->model->crear($reparacion)) {
-                $_SESSION['mensaje'] = "Reparación creada exitosamente";
-            } else {
-                $_SESSION['error'] = "Error al crear la reparación";
-            }
-            
-            header("Location: index.php?page=reparaciones");
-            exit;
-        }
-
-        // Obtener datos necesarios para el formulario
-        require_once __DIR__ . "/../models/DiagnosticosModel.php";
-        $diagnosticosModel = new DiagnosticosModel();
-        $diagnosticos = $diagnosticosModel->obtenerTodos();
-        
-        require "views/reparaciones/crear.php";
+        echo "Reparaciones crear";
     }
 
-    // 🗑️ Eliminar reparación (solo administradores)
-    public function eliminar() {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
+    public function editar() {
+        $idReparacion = $_GET['id'] ?? null;
+        if (!$idReparacion) {
+            die("ID de reparación no proporcionado");
         }
-        // Solo administradores pueden eliminar reparaciones
-        if (!isset($_SESSION["usuario_cargo"]) || $_SESSION["usuario_cargo"] !== "Administrador") {
-            header("Location: index.php?page=auth&action=login");
+
+        $reparacion = $this->model->obtenerPorId($idReparacion);
+        if (!$reparacion) {
+            die("Reparación no encontrada");
+        }
+
+        // Obtener datos relacionados
+        $diagnosticoModel = new DiagnosticosModel();
+        $diagnostico = $diagnosticoModel->obtenerPorId($reparacion->getIdDiagnostico());
+
+        $celularModel = new CelularesModel();
+        $celular = $celularModel->obtenerPorId($diagnostico->getIdCelular());
+
+        $clienteModel = new ClientesModel();
+        $cliente = $clienteModel->obtenerPorId($celular->getIdCliente());
+
+        $empleadoModel = new EmpleadoModel();
+        $empleado = $empleadoModel->obtenerPorId($diagnostico->getIdEmpleado());
+
+        // Agregar propiedades adicionales al objeto reparacion para la vista
+        $reparacion->cliente_nombre = $cliente ? $cliente->getNombre() : 'N/A';
+        $reparacion->celular_marca = $celular ? $celular->getMarca() : 'N/A';
+        $reparacion->celular_modelo = $celular ? $celular->getModelo() : 'N/A';
+        $reparacion->imei = $celular ? $celular->getImei() : 'N/A';
+
+        // Variables para la vista
+        $back_url = "index.php?page=reparaciones&action=index";
+        $action_url = "index.php?page=reparaciones&action=actualizar";
+
+        // Pasar datos a la vista
+        include __DIR__ . "/../views/viewsTecnico/editar.php";
+    }
+
+    public function actualizar() {
+        if ($_SERVER["REQUEST_METHOD"] === "POST") {
+            $id = $_POST['id_reparacion'] ?? null;
+            if (!$id) {
+                $_SESSION['error'] = "ID de reparación no proporcionado.";
+                header("Location: index.php?page=reparaciones&action=index");
+                exit;
+            }
+
+            $reparacion = $this->model->obtenerPorId($id);
+            if (!$reparacion) {
+                $_SESSION['error'] = "Reparación no encontrada.";
+                header("Location: index.php?page=reparaciones&action=index");
+                exit;
+            }
+
+            // Actualizar los campos
+            $reparacion->setDiagnostico($_POST['diagnostico'] ?? $reparacion->getDiagnostico());
+            $reparacion->setEstado($_POST['estado'] ?? $reparacion->getEstado());
+            $reparacion->setCosto($_POST['costo'] ?? $reparacion->getCosto());
+
+            // Si el estado es 'Listo' o 'Entregado', actualizar fecha_entrega
+            if (in_array($reparacion->getEstado(), ['Listo', 'Entregado'])) {
+                $reparacion->setFechaEntrega(date('Y-m-d H:i:s'));
+            }
+
+            $this->model->actualizar($reparacion);
+
+            $_SESSION['mensaje'] = "Reparación actualizada exitosamente.";
+            header("Location: index.php?page=reparaciones&action=index");
             exit;
         }
 
-        $id = $_GET["id"] ?? null;
-        if ($id) {
-            if ($this->model->eliminar($id)) {
-                $_SESSION['mensaje'] = "Reparación eliminada exitosamente";
-            } else {
-                $_SESSION['error'] = "Error al eliminar la reparación";
-            }
-        }
-        
-        header("Location: index.php?page=reparaciones");
+        // Si no es POST, redirigir
+        header("Location: index.php?page=reparaciones&action=index");
         exit;
     }
 
-    // 📊 Dashboard del técnico (método heredado)
-    public function dashboard() {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-        $id_tecnico = $_SESSION["id_empleado"] ?? 13; // simulado
-
-        $reparaciones = $this->model->obtenerPorEmpleado($id_tecnico);
-        include __DIR__ . "/../views/viewsTecnico/dashboard_tecnico.php";
+    public function eliminar() {
+        echo "Reparaciones eliminar";
     }
+
+    public function ver() {
+        $idReparacion = $_GET['id'] ?? null;
+        if (!$idReparacion) {
+            die("ID de reparación no proporcionado");
+        }
+
+        $reparacion = $this->model->obtenerPorId($idReparacion);
+        if (!$reparacion) {
+            die("Reparación no encontrada");
+        }
+
+        // Obtener datos relacionados
+        $diagnosticoModel = new DiagnosticosModel();
+        $diagnostico = $diagnosticoModel->obtenerPorId($reparacion->getIdDiagnostico());
+
+        $celularModel = new CelularesModel();
+        $celular = $celularModel->obtenerPorId($diagnostico->getIdCelular());
+
+        $clienteModel = new ClientesModel();
+        $cliente = $clienteModel->obtenerPorId($celular->getIdCliente());
+
+        $empleadoModel = new EmpleadoModel();
+        $empleado = $empleadoModel->obtenerPorId($diagnostico->getIdEmpleado());
+
+        // Pasar datos a la vista
+        include __DIR__ . "/../views/reparacion/ver.php";
+    }
+
+    
+
 }

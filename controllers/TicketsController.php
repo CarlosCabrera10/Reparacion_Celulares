@@ -89,6 +89,30 @@ class TicketsController {
         ';
 
         $pdf->writeHTML($html, true, false, true, false, '');
+
+        // Agregar QR Code con URL para ver detalles de la reparación
+        $url = URL . "index.php?page=reparacion&action=ver&id=" . $reparacion->getId();
+        $pdf->write2DBarcode($url, 'QRCODE,H', 30, $pdf->GetY() + 5, 20, 20, $style = array(), 'N');
         $pdf->Output('ticket_'.$ticket->getCodigoTicket().'.pdf', 'I'); // 'I' para mostrar en navegador
     }
+
+    public function show() {
+        $idTicket = $_GET['id'] ?? null;
+        if (!$idTicket) {
+            die("ID de ticket no proporcionado");
+        }
+
+        $ticket = $this->ticketsModel->obtenerPorId($idTicket);
+        if (!$ticket) {
+            die("Ticket no encontrado");
+        }
+
+        $reparacion = $this->reparacionesModel->obtenerPorId($ticket->getIdReparacion());
+        $diagnostico = $this->diagnosticosModel->obtenerPorId($reparacion->getIdDiagnostico());
+        $celular = $this->celularesModel->obtenerPorId($diagnostico->getIdCelular());
+        $cliente = $this->clientesModel->obtenerPorId($celular->getIdCliente());
+        $empleado = $this->empleadosModel->obtenerPorId($diagnostico->getIdEmpleado());
+
+        include __DIR__ . "/../views/tickets/detail.php";
+}
 }

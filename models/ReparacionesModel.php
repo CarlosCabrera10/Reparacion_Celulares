@@ -2,7 +2,6 @@
 require_once __DIR__ . "/../clases/Reparacion.php";
 require_once __DIR__ . "/../config/cn.php";
 
-
 class ReparacionesModel {
     private $db;
 
@@ -10,8 +9,17 @@ class ReparacionesModel {
         $this->db = (new Database())->conn;
     }
 
-      public function crear(Reparacion $r) {
-        $stmt = $this->db->prepare("INSERT INTO reparaciones (id_diagnostico, fecha_ingreso, fecha_entrega, estado, diagnostico, costo) VALUES (?, ?, ?, ?, ?, ?)");
+    // ✅ Método para acceder a la conexión
+    public function getDb() {
+        return $this->db;
+    }
+
+    // ✅ Crear una reparación
+    public function crear(Reparacion $r) {
+        $stmt = $this->db->prepare("
+            INSERT INTO reparaciones (id_diagnostico, fecha_ingreso, fecha_entrega, estado, diagnostico, costo)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ");
         $stmt->execute([
             $r->getIdDiagnostico(),
             $r->getFechaIngreso(),
@@ -23,27 +31,8 @@ class ReparacionesModel {
         $r->setId($this->db->lastInsertId());
     }
 
-    public function obtenerPorDiagnostico($idDiagnostico) {
-        $stmt = $this->db->prepare("SELECT * FROM reparaciones WHERE id_diagnostico = ?");
-        $stmt->execute([$idDiagnostico]);
-        $fila = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if ($fila) {
-            $r = new Reparacion(
-                $fila['id_reparacion'],
-                $fila['id_diagnostico'],
-                $fila['fecha_ingreso'],
-                $fila['fecha_entrega'],
-                $fila['estado'],
-                $fila['diagnostico'],
-                $fila['costo']
-            );
-            return $r;
-        }
-        return null;
-    }
-
-    public function obtenerPorEmpleado($id) {
+    // ✅ Obtener por ID
+    public function obtenerPorId($id) {
         $stmt = $this->db->prepare("SELECT * FROM reparaciones WHERE id_reparacion = ?");
         $stmt->execute([$id]);
         $fila = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -62,10 +51,52 @@ class ReparacionesModel {
         return null;
     }
 
+    // ✅ Obtener por diagnóstico
+    public function obtenerPorDiagnostico($idDiagnostico) {
+        $stmt = $this->db->prepare("SELECT * FROM reparaciones WHERE id_diagnostico = ?");
+        $stmt->execute([$idDiagnostico]);
+        $fila = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($fila) {
+            return new Reparacion(
+                $fila['id_reparacion'],
+                $fila['id_diagnostico'],
+                $fila['fecha_ingreso'],
+                $fila['fecha_entrega'],
+                $fila['estado'],
+                $fila['diagnostico'],
+                $fila['costo']
+            );
+        }
+        return null;
+    }
+
+    // ✅ Obtener todas las reparaciones (sin joins)
+    public function obtenerTodos() {
+        $stmt = $this->db->prepare("SELECT * FROM reparaciones");
+        $stmt->execute();
+        $filas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $reparaciones = [];
+        foreach ($filas as $fila) {
+            $reparaciones[] = new Reparacion(
+                $fila['id_reparacion'],
+                $fila['id_diagnostico'],
+                $fila['fecha_ingreso'],
+                $fila['fecha_entrega'],
+                $fila['estado'],
+                $fila['diagnostico'],
+                $fila['costo']
+            );
+        }
+        return $reparaciones;
+    }
+
+    // ✅ Obtener reparación con toda la información relacionada
     public function obtenerReparacionCompleta($id_reparacion) {
         $stmt = $this->db->prepare("
-            SELECT r.*, d.id_empleado as tecnico_id, c.nombre as cliente_nombre, 
-                   cel.marca, cel.modelo, cel.imei, e.nombre as tecnico_nombre
+            SELECT r.*, d.id_empleado AS tecnico_id, c.nombre AS cliente_nombre, 
+                   cel.marca, cel.modelo, cel.imei, e.nombre AS tecnico_nombre
             FROM reparaciones r 
             INNER JOIN diagnosticos d ON r.id_diagnostico = d.id_diagnostico 
             INNER JOIN celulares cel ON d.id_celular = cel.id_celular 
@@ -86,22 +117,24 @@ class ReparacionesModel {
                 $fila['diagnostico'],
                 $fila['costo']
             );
-            
-            // Agregar información adicional como propiedades dinámicas
             $reparacion->cliente_nombre = $fila['cliente_nombre'];
             $reparacion->celular_marca = $fila['marca'];
             $reparacion->celular_modelo = $fila['modelo'];
             $reparacion->imei = $fila['imei'];
             $reparacion->tecnico_nombre = $fila['tecnico_nombre'];
             $reparacion->tecnico_id = $fila['tecnico_id'];
-            
             return $reparacion;
         }
         return null;
     }
 
+    // ✅ Actualizar reparación
     public function actualizar(Reparacion $r) {
-        $stmt = $this->db->prepare("UPDATE reparaciones SET fecha_ingreso = ?, fecha_entrega = ?, estado = ?, diagnostico = ?, costo = ? WHERE id_reparacion = ?");
+        $stmt = $this->db->prepare("
+            UPDATE reparaciones 
+            SET fecha_ingreso = ?, fecha_entrega = ?, estado = ?, diagnostico = ?, costo = ? 
+            WHERE id_reparacion = ?
+        ");
         $resultado = $stmt->execute([
             $r->getFechaIngreso(),
             $r->getFechaEntrega(),
@@ -113,14 +146,16 @@ class ReparacionesModel {
         return $resultado && $stmt->rowCount() > 0;
     }
 
+    // ✅ Eliminar reparación
     public function eliminar($id) {
         $stmt = $this->db->prepare("DELETE FROM reparaciones WHERE id_reparacion = ?");
         $stmt->execute([$id]);
     }
 
+    // ✅ Obtener por técnico (todas sus reparaciones)
     public function obtenerPorTecnico($id_tecnico) {
         $stmt = $this->db->prepare("
-            SELECT r.*, d.id_empleado as tecnico_id, c.nombre as cliente_nombre, 
+            SELECT r.*, d.id_empleado AS tecnico_id, c.nombre AS cliente_nombre, 
                    cel.marca, cel.modelo, cel.imei 
             FROM reparaciones r 
             INNER JOIN diagnosticos d ON r.id_diagnostico = d.id_diagnostico 
@@ -143,24 +178,21 @@ class ReparacionesModel {
                 $fila['diagnostico'],
                 $fila['costo']
             );
-            
-            // Agregar información adicional
             $reparacion->cliente_nombre = $fila['cliente_nombre'];
             $reparacion->celular_marca = $fila['marca'];
             $reparacion->celular_modelo = $fila['modelo'];
             $reparacion->imei = $fila['imei'];
-            
             $reparaciones[] = $reparacion;
         }
-        
         return $reparaciones;
     }
 
+    // ✅ Obtener todas (con joins)
     public function obtenerTodas() {
         $stmt = $this->db->prepare("
-            SELECT r.*, d.id_empleado as tecnico_id, 
-                   c.nombre as cliente_nombre, cel.marca, cel.modelo, cel.imei,
-                   e.nombre as tecnico_nombre
+            SELECT r.*, d.id_empleado AS tecnico_id, 
+                   c.nombre AS cliente_nombre, cel.marca, cel.modelo, cel.imei,
+                   e.nombre AS tecnico_nombre
             FROM reparaciones r 
             INNER JOIN diagnosticos d ON r.id_diagnostico = d.id_diagnostico 
             INNER JOIN celulares cel ON d.id_celular = cel.id_celular 
@@ -182,24 +214,21 @@ class ReparacionesModel {
                 $fila['diagnostico'],
                 $fila['costo']
             );
-            
-            // Agregar información adicional
             $reparacion->cliente_nombre = $fila['cliente_nombre'];
             $reparacion->celular_marca = $fila['marca'];
             $reparacion->celular_modelo = $fila['modelo'];
             $reparacion->imei = $fila['imei'];
             $reparacion->tecnico_nombre = $fila['tecnico_nombre'];
-            
             $reparaciones[] = $reparacion;
         }
-        
         return $reparaciones;
     }
 
+    // ✅ Estadísticas por técnico
     public function obtenerEstadisticasTecnico($id_tecnico) {
         // Total de reparaciones
         $stmt = $this->db->prepare("
-            SELECT COUNT(*) as total 
+            SELECT COUNT(*) AS total 
             FROM reparaciones r 
             INNER JOIN diagnosticos d ON r.id_diagnostico = d.id_diagnostico 
             WHERE d.id_empleado = ?
@@ -209,7 +238,7 @@ class ReparacionesModel {
 
         // Reparaciones por estado
         $stmt = $this->db->prepare("
-            SELECT r.estado, COUNT(*) as cantidad 
+            SELECT r.estado, COUNT(*) AS cantidad 
             FROM reparaciones r 
             INNER JOIN diagnosticos d ON r.id_diagnostico = d.id_diagnostico 
             WHERE d.id_empleado = ?
@@ -218,9 +247,9 @@ class ReparacionesModel {
         $stmt->execute([$id_tecnico]);
         $porEstado = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // Reparaciones del mes actual
+        // Reparaciones del mes
         $stmt = $this->db->prepare("
-            SELECT COUNT(*) as este_mes 
+            SELECT COUNT(*) AS este_mes 
             FROM reparaciones r 
             INNER JOIN diagnosticos d ON r.id_diagnostico = d.id_diagnostico 
             WHERE d.id_empleado = ? 
@@ -232,7 +261,7 @@ class ReparacionesModel {
 
         // Reparaciones completadas esta semana
         $stmt = $this->db->prepare("
-            SELECT COUNT(*) as esta_semana 
+            SELECT COUNT(*) AS esta_semana 
             FROM reparaciones r 
             INNER JOIN diagnosticos d ON r.id_diagnostico = d.id_diagnostico 
             WHERE d.id_empleado = ? 
@@ -243,9 +272,9 @@ class ReparacionesModel {
         $stmt->execute([$id_tecnico]);
         $completadasSemana = $stmt->fetch(PDO::FETCH_ASSOC)['esta_semana'];
 
-        // Promedio de tiempo de reparación (días)
+        // Promedio de días entre ingreso y entrega
         $stmt = $this->db->prepare("
-            SELECT AVG(DATEDIFF(r.fecha_entrega, r.fecha_ingreso)) as promedio_dias 
+            SELECT AVG(DATEDIFF(r.fecha_entrega, r.fecha_ingreso)) AS promedio_dias 
             FROM reparaciones r 
             INNER JOIN diagnosticos d ON r.id_diagnostico = d.id_diagnostico 
             WHERE d.id_empleado = ? 
@@ -255,9 +284,9 @@ class ReparacionesModel {
         $stmt->execute([$id_tecnico]);
         $promedioDias = $stmt->fetch(PDO::FETCH_ASSOC)['promedio_dias'] ?? 0;
 
-        // Costo total generado
+        // Total generado
         $stmt = $this->db->prepare("
-            SELECT SUM(r.costo) as total_generado 
+            SELECT SUM(r.costo) AS total_generado 
             FROM reparaciones r 
             INNER JOIN diagnosticos d ON r.id_diagnostico = d.id_diagnostico 
             WHERE d.id_empleado = ? 
@@ -277,14 +306,13 @@ class ReparacionesModel {
         ];
     }
 
+    // ✅ Reparaciones recientes
     public function obtenerReparacionesRecientes($id_tecnico, $limite = 5) {
-        // Validar que el limite sea un número entero positivo para evitar inyección SQL
         $limite = (int)$limite;
         if ($limite <= 0) $limite = 5;
-        
-        // Usar una consulta con LIMIT como entero validado es seguro
+
         $sql = "
-            SELECT r.*, d.id_empleado as tecnico_id, c.nombre as cliente_nombre, 
+            SELECT r.*, d.id_empleado AS tecnico_id, c.nombre AS cliente_nombre, 
                    cel.marca, cel.modelo, cel.imei 
             FROM reparaciones r 
             INNER JOIN diagnosticos d ON r.id_diagnostico = d.id_diagnostico 
@@ -292,8 +320,9 @@ class ReparacionesModel {
             INNER JOIN clientes c ON cel.id_cliente = c.id_cliente 
             WHERE d.id_empleado = ?
             ORDER BY r.fecha_ingreso DESC
-            LIMIT " . $limite;
-            
+            LIMIT $limite
+        ";
+
         $stmt = $this->db->prepare($sql);
         $stmt->execute([$id_tecnico]);
         $filas = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -309,16 +338,12 @@ class ReparacionesModel {
                 $fila['diagnostico'],
                 $fila['costo']
             );
-            
-            // Agregar información adicional
             $reparacion->cliente_nombre = $fila['cliente_nombre'];
             $reparacion->celular_marca = $fila['marca'];
             $reparacion->celular_modelo = $fila['modelo'];
             $reparacion->imei = $fila['imei'];
-            
             $reparaciones[] = $reparacion;
         }
-        
         return $reparaciones;
     }
 }

@@ -2,6 +2,7 @@
 require_once __DIR__ . "/../config/cn.php";
 require_once __DIR__ . "/../clases/Diagnostico.php";
 
+
 class DiagnosticosModel {
     private $db;
 
@@ -53,8 +54,10 @@ class DiagnosticosModel {
         if ($resultado) {
             $id = $this->db->lastInsertId();
             $diagnostico->setId($id); // Establecer el ID en el objeto también
+
             return $id; // Devuelve el ID insertado
         }
+       
         return false;
     }
 
