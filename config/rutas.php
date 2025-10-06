@@ -6,7 +6,7 @@ class Contenido {
         "clientes" => "controllers/ClientesController.php",
         "celulares" => "controllers/CelularesController.php",
         "diagnosticos" => "controllers/DiagnosticosController.php",
-        "reparaciones" => "controllers/ReparacionesController.php",
+        "reparacion" => "controllers/ReparacionesController.php",
         "tickets" => "controllers/TicketsController.php",
         "reportes" => "controllers/ReportesController.php",
         "tecnico" => "controllers/TecnicoController.php"

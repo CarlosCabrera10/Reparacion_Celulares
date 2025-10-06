@@ -48,75 +48,23 @@ class DiagnosticosController {
         include __DIR__ . "/../views/diagnosticos/index.php";
     }
 
-    // public function crear() {
-    //     $celulares = $this->celularesModel->obtenerTodos();
-    //     $empleados = array_filter($this->empleadosModel->obtenerTodos(), function($e) {
-    //         return $e->getCargo() === "Tecnico";
-    //     });
-
-    //     if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    //         try {
-    //             $diagnostico = new Diagnostico(
-    //                 null,
-    //                 $_POST["id_celular"],
-    //                 $_POST["id_empleado"],
-    //                 $_POST["fecha_diagnostico"],
-    //                 $_POST["descripcion"]
-    //             );
-
-    //             $diagnostico_id = $this->model->crear($diagnostico);
-
-    //             if ($diagnostico_id) {
-    //                 // Crear reparación automáticamente usando el ID obtenido
-    //                 $reparacion = new Reparacion(
-    //                     null,
-    //                     $diagnostico_id, // Usar el ID devuelto por el modelo
-    //                     date('Y-m-d'), // fecha ingreso
-    //                     null,          // fecha entrega
-    //                     'Pendiente',
-    //                     null, // diagnostico inicial null
-    //                     null  // costo inicial null
-    //                 );
-    //                 $this->reparacionesModel->crear($reparacion);
-
-                    
-    //                 $codigoTicket = $this->ticketsModel->generarCodigo();
-    //                 $ticket = new Ticket(
-    //                     null,
-    //                     $reparacion->getId(),
-    //                     $codigoTicket
-    //                 );
-    //                 $this->ticketsModel->crear($ticket);
-
-    //                 header("Location: index.php?page=diagnosticos&action=index");
-    //                 exit;
-    //             } else {
-    //                 $error = "Error al crear el diagnóstico.";
-    //             }
-    //         } catch (Exception $e) {
-    //             $error = "Error: " . $e->getMessage();
-    //         }
-    //     }
-
-    //     include __DIR__ . "/../views/diagnosticos/form.php";
-    // }
-
-     public function crear() {
+    public function crear() {
         $celulares = $this->celularesModel->obtenerTodos();
         $empleados = array_filter($this->empleadosModel->obtenerTodos(), function($e) {
             return $e->getCargo() === "Tecnico";
         });
 
         if ($_SERVER["REQUEST_METHOD"] === "POST") {
-            $diagnostico = new Diagnostico(
-                null,
-                $_POST["id_celular"],
-                $_POST["id_empleado"],
-                $_POST["fecha_diagnostico"],
-                $_POST["descripcion"]
-            );
+            try {
+                $diagnostico = new Diagnostico(
+                    null,
+                    $_POST["id_celular"],
+                    $_POST["id_empleado"],
+                    $_POST["fecha_diagnostico"],
+                    $_POST["descripcion"]
+                );
 
-            $this->model->crear($diagnostico);
+
             $id = $this->model->crear($diagnostico);
             $diagnostico->setId($id);
 
@@ -143,10 +91,12 @@ class DiagnosticosController {
 
             header("Location: index.php?page=diagnosticos&action=index");
             exit;
+
         }
 
         include __DIR__ . "/../views/diagnosticos/form.php";
     }
+}
 
     public function editar() {
         $id = $_GET["id"] ?? null;

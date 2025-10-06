@@ -1,6 +1,9 @@
 <?php
 require_once __DIR__ . "/../clases/Ticket.php";
 require_once __DIR__ . "/../config/cn.php";
+require_once __DIR__ . "/TicketsModel.php";
+
+
 
 class TicketsModel {
     private $db;
