@@ -63,7 +63,8 @@ class DiagnosticosController {
                 $_POST["descripcion"]
             );
 
-            $this->model->crear($diagnostico);
+            $id = $this->model->crear($diagnostico);
+            $diagnostico->setId($id);
 
             // Crear reparación automáticamente
             $reparacion = new Reparacion(
@@ -76,6 +77,15 @@ class DiagnosticosController {
                 null
             );
             $this->reparacionesModel->crear($reparacion);
+
+            // Crear ticket automáticamente
+            $codigoTicket = $this->ticketsModel->generarCodigo();
+            $ticket = new Ticket(
+                null,
+                $reparacion->getId(),
+                $codigoTicket
+            );
+            $this->ticketsModel->crear($ticket);
 
             header("Location: index.php?page=diagnosticos&action=index");
             exit;

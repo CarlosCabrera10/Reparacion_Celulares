@@ -1,0 +1,6 @@
+- [x] Update login check in index.php to exclude "reparaciones" page from login requirement
+- [x] Update login check in index.php to exclude "tecnico" page from login requirement
+- [x] Change QR URL in TicketsController to use page=reparacion&action=ver instead of page=tecnico&action=ver
+- [x] Modificar DiagnosticosController::crear() para crear un ticket después de crear la reparación
+- [x] Implementar funcionalidad de editar reparación en ReparacionesController
+- [ ] Probar la creación de diagnóstico y verificar que se cree el ticket

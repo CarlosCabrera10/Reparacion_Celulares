@@ -9,6 +9,10 @@ class ReparacionesModel {
         $this->db = (new Database())->conn;
     }
 
+    public function getDb() {
+        return $this->db;
+    }
+
       public function crear(Reparacion $r) {
         $stmt = $this->db->prepare("INSERT INTO reparaciones (id_diagnostico, fecha_ingreso, fecha_entrega, estado, diagnostico, costo) VALUES (?, ?, ?, ?, ?, ?)");
         $stmt->execute([
@@ -59,6 +63,26 @@ class ReparacionesModel {
             );
         }
         return null;
+    }
+
+    public function obtenerTodos() {
+        $stmt = $this->db->prepare("SELECT * FROM reparaciones");
+        $stmt->execute();
+        $filas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $reparaciones = [];
+        foreach ($filas as $fila) {
+            $reparaciones[] = new Reparacion(
+                $fila['id_reparacion'],
+                $fila['id_diagnostico'],
+                $fila['fecha_ingreso'],
+                $fila['fecha_entrega'],
+                $fila['estado'],
+                $fila['diagnostico'],
+                $fila['costo']
+            );
+        }
+        return $reparaciones;
     }
 
     public function actualizar(Reparacion $r) {
