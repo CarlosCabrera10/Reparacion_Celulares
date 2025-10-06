@@ -8,6 +8,14 @@ class Reparacion {
     private $diagnostico;
     private $costo;
     private $ticket;
+    
+    // Propiedades adicionales para información extendida
+    public $cliente_nombre;
+    public $celular_marca;
+    public $celular_modelo;
+    public $imei;
+    public $tecnico_nombre;
+    public $tecnico_id;
 
     public function __construct($id = null, $id_diagnostico, $fecha_ingreso, $fecha_entrega = null, $estado = 'Pendiente', $diagnostico = null, $costo = null) {
         $this->id = $id;

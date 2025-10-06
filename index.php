@@ -20,6 +20,12 @@ if ($page === "empleados" && $cargo !== "Administrador") {
     exit;
 }
 
+// Bloquear acceso a tecnico si no es Tecnico
+if ($page === "tecnico" && $cargo !== "Tecnico") {
+    header("Location: index.php?page=auth&action=login");
+    exit;
+}
+
 // Controlador
 $archivo = Contenido::obtenerContenido($page);
 require_once $archivo;

@@ -31,7 +31,7 @@ class AuthController {
                         header("Location: index.php?page=celulares&action=index");
                         exit;
                     case "Tecnico":
-                        header("Location: index.php?page=tecnico&action=index");
+                        header("Location: index.php?page=tecnico");
                         exit;
                     default:
                         session_destroy();

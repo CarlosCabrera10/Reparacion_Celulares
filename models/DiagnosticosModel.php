@@ -51,7 +51,9 @@ class DiagnosticosModel {
         ]);
 
         if ($resultado) {
-            return $this->db->lastInsertId(); // Devuelve el ID insertado
+            $id = $this->db->lastInsertId();
+            $diagnostico->setId($id); // Establecer el ID en el objeto también
+            return $id; // Devuelve el ID insertado
         }
         return false;
     }

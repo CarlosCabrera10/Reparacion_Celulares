@@ -9,8 +9,8 @@ class Contenido {
         "reparaciones" => "controllers/ReparacionesController.php",
         "tickets" => "controllers/TicketsController.php",
         "reportes" => "controllers/ReportesController.php",
-        "tecnico" => "controllers/EmpleadosController.php",
-        "reparacion" => "controllers/ReparacionesController.php"
+        "tecnico" => "controllers/TecnicoController.php"
+
     ];
 
     public static function obtenerContenido($clave) {

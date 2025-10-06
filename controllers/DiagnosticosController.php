@@ -55,13 +55,15 @@ class DiagnosticosController {
         });
 
         if ($_SERVER["REQUEST_METHOD"] === "POST") {
-            $diagnostico = new Diagnostico(
-                null,
-                $_POST["id_celular"],
-                $_POST["id_empleado"],
-                $_POST["fecha_diagnostico"],
-                $_POST["descripcion"]
-            );
+            try {
+                $diagnostico = new Diagnostico(
+                    null,
+                    $_POST["id_celular"],
+                    $_POST["id_empleado"],
+                    $_POST["fecha_diagnostico"],
+                    $_POST["descripcion"]
+                );
+
 
             $id = $this->model->crear($diagnostico);
             $diagnostico->setId($id);
@@ -89,10 +91,12 @@ class DiagnosticosController {
 
             header("Location: index.php?page=diagnosticos&action=index");
             exit;
+
         }
 
         include __DIR__ . "/../views/diagnosticos/form.php";
     }
+}
 
     public function editar() {
         $id = $_GET["id"] ?? null;
