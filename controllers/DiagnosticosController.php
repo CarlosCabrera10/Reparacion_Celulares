@@ -55,30 +55,38 @@ class DiagnosticosController {
         });
 
         if ($_SERVER["REQUEST_METHOD"] === "POST") {
-            $diagnostico = new Diagnostico(
-                null,
-                $_POST["id_celular"],
-                $_POST["id_empleado"],
-                $_POST["fecha_diagnostico"],
-                $_POST["descripcion"]
-            );
+            try {
+                $diagnostico = new Diagnostico(
+                    null,
+                    $_POST["id_celular"],
+                    $_POST["id_empleado"],
+                    $_POST["fecha_diagnostico"],
+                    $_POST["descripcion"]
+                );
 
-            $this->model->crear($diagnostico);
+                $diagnostico_id = $this->model->crear($diagnostico);
 
-            // Crear reparación automáticamente
-            $reparacion = new Reparacion(
-                null,
-                $diagnostico->getId(),
-                date('Y-m-d'), // fecha ingreso
-                null,          // fecha entrega
-                'Pendiente',
-                null,
-                null
-            );
-            $this->reparacionesModel->crear($reparacion);
-
-            header("Location: index.php?page=diagnosticos&action=index");
-            exit;
+                if ($diagnostico_id) {
+                    // Crear reparación automáticamente usando el ID obtenido
+                    $reparacion = new Reparacion(
+                        null,
+                        $diagnostico_id, // Usar el ID devuelto por el modelo
+                        date('Y-m-d'), // fecha ingreso
+                        null,          // fecha entrega
+                        'Pendiente',
+                        null, // diagnostico inicial null
+                        null  // costo inicial null
+                    );
+                    $this->reparacionesModel->crear($reparacion);
+                    
+                    header("Location: index.php?page=diagnosticos&action=index");
+                    exit;
+                } else {
+                    $error = "Error al crear el diagnóstico.";
+                }
+            } catch (Exception $e) {
+                $error = "Error: " . $e->getMessage();
+            }
         }
 
         include __DIR__ . "/../views/diagnosticos/form.php";
