@@ -17,6 +17,7 @@ require_once __DIR__ . "/../layout/menu.php";
                     <h5>Reparaciones por mes</h5>
                     <canvas id="graficoMes"></canvas>
                     <a href="index.php?page=reportes&action=generarMes" class="btn btn-primary mt-2">Generar PDF</a>
+                    <a href="index.php?page=reportes&action=generarMesExcel" class="btn btn-success mt-2">Descargar Excel</a>
                 </div>
             </div>
         </div>
@@ -28,6 +29,7 @@ require_once __DIR__ . "/../layout/menu.php";
                     <h5>Reparaciones por técnico</h5>
                     <canvas id="graficoTecnico"></canvas>
                     <a href="index.php?page=reportes&action=generarTecnico" class="btn btn-primary mt-2">Generar PDF</a>
+                    <a href="index.php?page=reportes&action=generarTecnicoExcel" class="btn btn-success mt-2">Descargar Excel</a>
                 </div>
             </div>
         </div>
@@ -39,6 +41,7 @@ require_once __DIR__ . "/../layout/menu.php";
                     <h5>Reparaciones por marca</h5>
                     <canvas id="graficoMarca"></canvas>
                     <a href="index.php?page=reportes&action=generarMarca" class="btn btn-primary mt-2">Generar PDF</a>
+                    <a href="index.php?page=reportes&action=generarMarcaExcel" class="btn btn-success mt-2">Descargar Excel</a>
                 </div>
             </div>
         </div>
