@@ -57,7 +57,7 @@ if (isset($_SESSION['cargo'])) {
               <a class="nav-link" href="index.php?page=empleados&action=index">Empleados</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="index.php?page=reparaciones&action=index">Reparaciones</a>
+              <a class="nav-link" href="index.php?page=reparacion&action=index">Reparaciones</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="index.php?page=reportes&action=index">Reportes</a>
@@ -71,11 +71,11 @@ if (isset($_SESSION['cargo'])) {
             <li class="nav-item">
               <a class="nav-link" href="index.php?page=celulares&action=index">Celulares</a>
             </li>
-                        <li class="nav-item">
+              <li class="nav-item">
               <a class="nav-link" href="index.php?page=diagnosticos&action=index">Diagnosticos</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="index.php?page=reparaciones&action=index">Reparaciones</a>
+              <a class="nav-link" href="index.php?page=reparacion&action=index">Reparaciones</a>
             </li>
 
           <?php elseif ($_SESSION["usuario_cargo"] === "Tecnico"): ?>
