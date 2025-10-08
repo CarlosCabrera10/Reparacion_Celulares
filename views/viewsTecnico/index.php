@@ -437,6 +437,7 @@ $nombreTecnico = $_SESSION["usuario_nombre"] ?? "Técnico";
                                         <th><i class="bi bi-calendar"></i> Fecha Ingreso</th>
                                         <th><i class="bi bi-calendar-check"></i> Fecha Entrega</th>
                                         <th><i class="bi bi-clipboard-check"></i> Estado</th>
+                                        <th><i class="bi bi-file-text"></i> Diagnóstico Inicial</th>
                                         <th><i class="bi bi-file-text"></i> Diagnóstico</th>
                                         <th><i class="bi bi-currency-dollar"></i> Costo</th>
                                         <th><i class="bi bi-tools"></i> Acciones</th>
@@ -491,6 +492,19 @@ $nombreTecnico = $_SESSION["usuario_nombre"] ?? "Técnico";
                                                     <?= $r->getEstado() ?>
                                                 </span>
                                             </td>
+                                            <td>
+                                                <div style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">
+                                                    <?php if (!empty($r->descripcion)): ?>
+                                                        <span data-bs-toggle="tooltip" title="<?= htmlspecialchars($r->descripcion) ?>">
+                                                            <?= htmlspecialchars(substr($r->descripcion, 0, 50)) ?><?= strlen($r->descripcion) > 50 ? '...' : '' ?>
+                                                        </span>
+                                                    <?php else: ?>
+                                                        <span class="text-muted">Sin diagnóstico</span>
+                                                    <?php endif; ?>
+                                                </div>
+                                            </td>
+
+
                                             <td>
                                                 <div style="max-width: 200px; overflow: hidden; text-overflow: ellipsis;">
                                                     <?php if ($r->getDiagnostico()): ?>

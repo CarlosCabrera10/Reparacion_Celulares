@@ -16,6 +16,8 @@ class Reparacion {
     public $imei;
     public $tecnico_nombre;
     public $tecnico_id;
+    public $descripcion;
+
 
     public function __construct($id = null, $id_diagnostico, $fecha_ingreso, $fecha_entrega = null, $estado = 'Pendiente', $diagnostico = null, $costo = null) {
         $this->id = $id;
@@ -25,6 +27,7 @@ class Reparacion {
         $this->estado = $estado;
         $this->diagnostico = $diagnostico;
         $this->costo = $costo;
+        $this->descripcion = null; // Inicializamos
     }
 
     public function getId() { return $this->id; }
@@ -34,6 +37,8 @@ class Reparacion {
     public function getEstado() { return $this->estado; }
     public function getDiagnostico() { return $this->diagnostico; }
     public function getCosto() { return $this->costo; }
+    public function getDescripcion() { return $this->descripcion; }
+
 
     public function setId($id) { $this->id = $id; }
     public function setIdDiagnostico($id_diagnostico) { $this->id_diagnostico = $id_diagnostico; }

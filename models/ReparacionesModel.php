@@ -95,8 +95,12 @@ class ReparacionesModel {
     // ✅ Obtener reparación con toda la información relacionada
     public function obtenerReparacionCompleta($id_reparacion) {
         $stmt = $this->db->prepare("
-            SELECT r.*, d.id_empleado AS tecnico_id, c.nombre AS cliente_nombre, 
-                   cel.marca, cel.modelo, cel.imei, e.nombre AS tecnico_nombre
+            SELECT r.*, 
+                d.descripcion,         -- nombre real del campo en la base
+                d.id_empleado AS tecnico_id, 
+                c.nombre AS cliente_nombre, 
+                cel.marca, cel.modelo, cel.imei, 
+                e.nombre AS tecnico_nombre
             FROM reparaciones r 
             INNER JOIN diagnosticos d ON r.id_diagnostico = d.id_diagnostico 
             INNER JOIN celulares cel ON d.id_celular = cel.id_celular 
@@ -114,7 +118,7 @@ class ReparacionesModel {
                 $fila['fecha_ingreso'],
                 $fila['fecha_entrega'],
                 $fila['estado'],
-                $fila['diagnostico'],
+                $fila['diagnostico'], // diagnóstico de la reparación
                 $fila['costo']
             );
             $reparacion->cliente_nombre = $fila['cliente_nombre'];
@@ -123,10 +127,12 @@ class ReparacionesModel {
             $reparacion->imei = $fila['imei'];
             $reparacion->tecnico_nombre = $fila['tecnico_nombre'];
             $reparacion->tecnico_id = $fila['tecnico_id'];
+            $reparacion->descripcion = $fila['descripcion']; // diagnóstico inicial del diagnóstico
             return $reparacion;
         }
         return null;
     }
+
 
     // ✅ Actualizar reparación
     public function actualizar(Reparacion $r) {
@@ -151,12 +157,15 @@ class ReparacionesModel {
         $stmt = $this->db->prepare("DELETE FROM reparaciones WHERE id_reparacion = ?");
         $stmt->execute([$id]);
     }
-
+    
     // ✅ Obtener por técnico (todas sus reparaciones)
     public function obtenerPorTecnico($id_tecnico) {
         $stmt = $this->db->prepare("
-            SELECT r.*, d.id_empleado AS tecnico_id, c.nombre AS cliente_nombre, 
-                   cel.marca, cel.modelo, cel.imei 
+            SELECT r.*, 
+                d.descripcion AS descripcion, 
+                d.id_empleado AS tecnico_id, 
+                c.nombre AS cliente_nombre, 
+                cel.marca, cel.modelo, cel.imei 
             FROM reparaciones r 
             INNER JOIN diagnosticos d ON r.id_diagnostico = d.id_diagnostico 
             INNER JOIN celulares cel ON d.id_celular = cel.id_celular 
@@ -182,17 +191,24 @@ class ReparacionesModel {
             $reparacion->celular_marca = $fila['marca'];
             $reparacion->celular_modelo = $fila['modelo'];
             $reparacion->imei = $fila['imei'];
+
+            // Agregamos la descripción del diagnóstico
+            $reparacion->descripcion = $fila['descripcion'];
+
             $reparaciones[] = $reparacion;
         }
         return $reparaciones;
-    }
+}
 
-    // ✅ Obtener todas (con joins)
+
     public function obtenerTodas() {
         $stmt = $this->db->prepare("
-            SELECT r.*, d.id_empleado AS tecnico_id, 
-                   c.nombre AS cliente_nombre, cel.marca, cel.modelo, cel.imei,
-                   e.nombre AS tecnico_nombre
+            SELECT r.*, 
+                d.descripcion AS descripcion_diagnostico, 
+                d.id_empleado AS tecnico_id, 
+                c.nombre AS cliente_nombre, 
+                cel.marca, cel.modelo, cel.imei, 
+                e.nombre AS tecnico_nombre
             FROM reparaciones r 
             INNER JOIN diagnosticos d ON r.id_diagnostico = d.id_diagnostico 
             INNER JOIN celulares cel ON d.id_celular = cel.id_celular 
@@ -219,10 +235,12 @@ class ReparacionesModel {
             $reparacion->celular_modelo = $fila['modelo'];
             $reparacion->imei = $fila['imei'];
             $reparacion->tecnico_nombre = $fila['tecnico_nombre'];
+            $reparacion->descripcion_diagnostico = $fila['descripcion_diagnostico']; // 👈 Agregado
             $reparaciones[] = $reparacion;
         }
         return $reparaciones;
     }
+
 
     // ✅ Estadísticas por técnico
     public function obtenerEstadisticasTecnico($id_tecnico) {

@@ -9,9 +9,8 @@ class EmpleadoModel {
         $this->db = (new Database())->conn;
     }
 
-    // Obtener todos los empleados
     public function obtenerTodos() {
-        $stmt = $this->db->query("SELECT * FROM Empleados");
+        $stmt = $this->db->query("SELECT * FROM empleados");
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         $empleados = [];
@@ -21,15 +20,15 @@ class EmpleadoModel {
                 $row["nombre"],
                 $row["cargo"],
                 $row["usuario"] ?? null,
-                $row["password"] ?? null
+                $row["password"] ?? null,
+                $row["activo"] ?? 1 
             );
         }
         return $empleados;
     }
 
-    // Obtener un empleado por ID
     public function obtenerPorId($id) {
-        $stmt = $this->db->prepare("SELECT * FROM Empleados WHERE id_empleado=?");
+        $stmt = $this->db->prepare("SELECT * FROM empleados WHERE id_empleado = ?");
         $stmt->execute([$id]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -38,9 +37,11 @@ class EmpleadoModel {
             $row["nombre"],
             $row["cargo"],
             $row["usuario"] ?? null,
-            $row["password"] ?? null
+            $row["password"] ?? null,
+            $row["activo"] ?? 1 
         ) : null;
     }
+
 
     // Crear un empleado
     public function crear(Empleado $empleado) {
@@ -85,4 +86,10 @@ class EmpleadoModel {
             $row["password"]
         ) : null;
     }
+
+    public function actualizarEstado($id, $activo) {
+        $stmt = $this->db->prepare("UPDATE empleados SET activo = ? WHERE id_empleado = ?");
+        return $stmt->execute([$activo, $id]);
+    }
+
 }

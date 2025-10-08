@@ -90,4 +90,20 @@ class EmpleadosController {
             header("Location: index.php?page=empleados&action=index");
         exit;
     }
+
+
+    public function toggleEstado() {
+        $id = $_GET['id'] ?? null;
+        if ($id) {
+            $empleado = $this->model->obtenerPorId($id);
+            if ($empleado) {
+                $nuevoEstado = $empleado->getActivo() ? 0 : 1;
+                $this->model->actualizarEstado($id, $nuevoEstado);
+                $_SESSION['mensaje'] = $nuevoEstado ? 'Empleado activado' : 'Empleado desactivado';
+            }
+        }
+        header('Location: index.php?page=empleados');
+        exit;
+    }
+
 }

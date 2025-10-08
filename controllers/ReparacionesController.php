@@ -14,7 +14,7 @@ class ReparacionesController {
     }
 
     public function index() {
-        $reparaciones = $this->model->obtenerTodos();
+        $reparaciones = $this->model->obtenerTodas();
         include __DIR__ . "/../views/empleados/reparaciones.php";
     }
 

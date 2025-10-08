@@ -116,7 +116,6 @@ class DiagnosticosController {
                 $_POST["descripcion"]
             );
 
-            $this->model->crear($diagnostico);
             $id = $this->model->crear($diagnostico);
             $diagnostico->setId($id);
 

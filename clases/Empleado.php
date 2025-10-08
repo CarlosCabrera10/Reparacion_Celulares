@@ -5,14 +5,17 @@ class Empleado {
     private $cargo;
     private $usuario;
     private $password;
+    private $activo; // 1 = activo, 0 = inactivo
 
     // Constructor
-    public function __construct($id, $nombre, $cargo, $usuario, $password) {
+    public function __construct($id, $nombre, $cargo, $usuario, $password, $activo = 1 ) {
         $this->id = $id;
         $this->nombre = $nombre;
         $this->cargo = $cargo;
         $this->usuario = $usuario;
         $this->password = $password;
+        $this->activo = $activo;
+
     }
 
     // Getters
@@ -50,5 +53,13 @@ class Empleado {
 
     public function setPassword($password) {
         $this->password = $password;
+    }
+
+    public function getActivo() {
+    return $this->activo;
+    }
+
+    public function setActivo($activo) {
+        $this->activo = $activo;
     }
 }
