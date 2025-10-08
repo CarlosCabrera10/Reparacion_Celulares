@@ -102,53 +102,144 @@ class ReportesController {
         $pdf->Output('reporte_mes.pdf', 'I');
     }
 
+    public function generarMesExcel() {
+        $data = $this->model->reparacionesPorMes();
+
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="reporte_mes.csv"');
+        header('Cache-Control: max-age=0');
+
+        $output = fopen('php://output', 'w');
+
+        // Encabezados
+        fputcsv($output, ['Mes', 'Pendientes', 'En Reparacion', 'Listos', 'Entregados']);
+
+        // Datos
+        foreach ($data as $item) {
+            fputcsv($output, [$item['mes'], $item['pendientes'], $item['en_reparacion'], $item['listos'], $item['entregados']]);
+        }
+
+        fclose($output);
+        exit;
+    }
+
     public function generarTecnico() {
-        $data = $this->model->reparacionesPorTecnico();
+    $data = $this->model->reparacionesPorTecnico() ?? [];
 
-        // Preparar datos
-        $tecnicos = array_column($data, 'tecnico');
-        $totales = array_column($data, 'total');
-
-        // Crear PDF con FPDF
+    // Si no hay datos, mostramos PDF con mensaje
+    if (empty($data)) {
         $pdf = new FPDF();
         $pdf->AddPage();
-        $pdf->SetFont('Arial', 'B', 16);
-        $pdf->Cell(0, 10, 'Reporte de Reparaciones por Tecnico', 0, 1, 'C');
-        $pdf->Ln(10);
+        $pdf->SetFont('Arial','B',16);
+        $pdf->Cell(0, 10, utf8_decode('Reporte de Reparaciones por Técnico'), 0, 1, 'C');
+        $pdf->Ln(8);
+        $pdf->SetFont('Arial','',12);
+        $pdf->Cell(0, 10, utf8_decode('No hay datos para mostrar.'), 0, 1, 'C');
+        return $pdf->Output('reporte_tecnico.pdf', 'I');
+    }
 
-        // Add table with data
-        $pdf->SetFont('Arial', 'B', 12);
-        $pdf->Cell(80, 10, 'Tecnico', 1);
-        $pdf->Cell(40, 10, 'Total', 1);
+    // Preparar datos
+    $tecnicos = array_column($data, 'tecnico');
+    $totales  = array_map('intval', array_column($data, 'total'));
+
+    // Crear PDF con FPDF
+    $pdf = new FPDF();
+    $pdf->AddPage();
+    $pdf->SetFont('Arial', 'B', 16);
+    $pdf->Cell(0, 10, utf8_decode('Reporte de Reparaciones por Técnico'), 0, 1, 'C');
+    $pdf->Ln(10);
+
+    // Tabla
+    $pdf->SetFont('Arial', 'B', 12);
+    $pdf->Cell(120, 10, utf8_decode('Técnico'), 1);
+    $pdf->Cell(40, 10, 'Total', 1);
+    $pdf->Ln();
+
+    $pdf->SetFont('Arial', '', 12);
+    for ($i = 0; $i < count($tecnicos); $i++) {
+        $pdf->Cell(120, 10, utf8_decode((string)$tecnicos[$i]), 1);
+        $pdf->Cell(40, 10, (string)$totales[$i], 1);
         $pdf->Ln();
+    }
 
-        $pdf->SetFont('Arial', '', 12);
-        for ($i = 0; $i < count($tecnicos); $i++) {
-            $pdf->Cell(80, 10, $tecnicos[$i], 1);
-            $pdf->Cell(40, 10, $totales[$i], 1);
-            $pdf->Ln();
+    $pdf->Ln(10);
+
+    // Gráfico: cada barra con color distinto
+    $width  = 180;
+    $height = 100;
+    $x      = 10;
+    $y      = $pdf->GetY();
+
+    $maxVal = max(1, (int)max($totales)); // evita división por cero
+    $scale  = $height / $maxVal;
+
+    $numTecnicos = max(1, count($tecnicos));
+    $barWidth    = ($width / $numTecnicos) * 0.85; // un poco de separación
+    $gap         = ($width / $numTecnicos) * 0.15; // espacio entre barras
+
+    // Paleta de colores (rotará si hay más técnicos que colores)
+    $colors = [
+        [255, 99, 132],  // rojo suave
+        [54, 162, 235],  // azul
+        [255, 206, 86],  // amarillo
+        [75, 192, 192],  // turquesa
+        [153, 102, 255], // violeta
+        [255, 159, 64],  // naranja
+        [40, 167, 69],   // verde
+        [23, 162, 184],  // teal
+        [108, 117, 125], // gris
+        [255, 193, 7],   // ámbar
+    ];
+
+    for ($i = 0; $i < $numTecnicos; $i++) {
+        $c = $colors[$i % count($colors)];
+        $pdf->SetFillColor($c[0], $c[1], $c[2]);
+        $pdf->SetDrawColor(255, 255, 255); // borde claro para separar visualmente
+
+        $bx = $x + $i * ($barWidth + $gap);
+        $bh = max(0, $totales[$i] * $scale);
+        $by = $y + $height - $bh;
+
+        // Barra
+        $pdf->Rect($bx, $by, $barWidth, $bh, 'FD');
+
+        // Etiqueta (técnico) debajo
+        $pdf->SetFont('Arial', '', 8);
+        $pdf->SetTextColor(0, 0, 0);
+        $pdf->Text($bx, $y + $height + 5, utf8_decode((string)$tecnicos[$i]));
+
+        // Valor encima de la barra
+        if ($bh > 6) { // solo si hay altura suficiente
+            $pdf->SetFont('Arial', 'B', 8);
+            $pdf->SetTextColor(0, 0, 0);
+            $tw = $pdf->GetStringWidth((string)$totales[$i]);
+            $pdf->Text($bx + ($barWidth/2) - ($tw/2), $by - 2, (string)$totales[$i]);
+        }
+    }
+
+    return $pdf->Output('reporte_tecnico.pdf', 'I');
+}
+
+
+    public function generarTecnicoExcel() {
+        $data = $this->model->reparacionesPorTecnico();
+
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="reporte_tecnico.csv"');
+        header('Cache-Control: max-age=0');
+
+        $output = fopen('php://output', 'w');
+
+        // Encabezados
+        fputcsv($output, ['Tecnico', 'Total', 'Tiempo Promedio']);
+
+        // Datos
+        foreach ($data as $item) {
+            fputcsv($output, [$item['tecnico'], $item['total'], $item['tiempo_promedio']]);
         }
 
-        $pdf->Ln(10);
-
-        // Draw chart
-        $width = 180;
-        $height = 100;
-        $x = 10;
-        $y = $pdf->GetY();
-        $max = max($totales);
-        $scale = $height / $max;
-        $numTecnicos = count($tecnicos);
-        $barWidth = $width / $numTecnicos;
-
-        for ($i = 0; $i < $numTecnicos; $i++) {
-            $pdf->SetFillColor(100, 100, 255);
-            $pdf->Rect($x + $i * $barWidth, $y + $height - $totales[$i] * $scale, $barWidth, $totales[$i] * $scale, 'F');
-            $pdf->SetFont('Arial', '', 8);
-            $pdf->Text($x + $i * $barWidth, $y + $height + 5, $tecnicos[$i]);
-        }
-
-        $pdf->Output('reporte_tecnico.pdf', 'I');
+        fclose($output);
+        exit;
     }
 
   public function generarMarca() {
@@ -288,6 +379,27 @@ class ReportesController {
 
     return $pdf->Output('reporte_marca.pdf','I');
 }
+
+    public function generarMarcaExcel() {
+        $data = $this->model->reparacionesPorMarca();
+
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="reporte_marca.csv"');
+        header('Cache-Control: max-age=0');
+
+        $output = fopen('php://output', 'w');
+
+        // Encabezados
+        fputcsv($output, ['Marca', 'Total']);
+
+        // Datos
+        foreach ($data as $item) {
+            fputcsv($output, [$item['marca'], $item['total']]);
+        }
+
+        fclose($output);
+        exit;
+    }
 
 
 }
