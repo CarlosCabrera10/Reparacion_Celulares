@@ -283,12 +283,19 @@
                                                     class="btn btn-outline-primary" data-bs-toggle="tooltip" title="Editar empleado">
                                                         <i class="bi bi-pencil"></i>
                                                     </a>
-                                                    <a href="index.php?page=empleados&action=toggleEstado&id=<?= $e->getId(); ?>" 
-                                                    class="btn btn-outline-warning"
-                                                    onclick="return confirm('¿Seguro que desea <?= $e->getActivo() ? 'desactivar' : 'activar' ?> este empleado?');"
-                                                    title="<?= $e->getActivo() ? 'Desactivar' : 'Activar' ?>">
-                                                        <i class="bi <?= $e->getActivo() ? 'bi-person-dash' : 'bi-person-check' ?>"></i>
-                                                    </a>
+                                                    
+                                                    <?php if ($_SESSION['usuario_id'] != $e->getId()): ?>
+                                                        <a href="index.php?page=empleados&action=toggleEstado&id=<?= $e->getId(); ?>" 
+                                                        class="btn btn-outline-warning"
+                                                        onclick="return confirm('¿Seguro que desea <?= $e->getActivo() ? 'desactivar' : 'activar' ?> este empleado?');"
+                                                        title="<?= $e->getActivo() ? 'Desactivar' : 'Activar' ?>">
+                                                            <i class="bi <?= $e->getActivo() ? 'bi-person-dash' : 'bi-person-check' ?>"></i>
+                                                        </a>
+                                                    <?php else: ?>
+                                                        <button class="btn btn-outline-secondary" disabled title="No puedes desactivar tu propia cuenta">
+                                                            <i class="bi bi-person-x"></i>
+                                                        </button>
+                                                    <?php endif; ?>
                                                 </div>
                                             </td>
 

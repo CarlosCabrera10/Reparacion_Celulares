@@ -5,6 +5,7 @@ class Diagnostico {
     private $id_empleado;
     private $fecha_diagnostico;
     private $descripcion;
+    private $estado = "Activo";
 
     // Objetos relacionados
     private $celular;
@@ -12,12 +13,13 @@ class Diagnostico {
     private $reparacion;
 
 
-    public function __construct($id = null, $id_celular, $id_empleado, $fecha_diagnostico, $descripcion) {
+    public function __construct($id = null, $id_celular, $id_empleado, $fecha_diagnostico, $descripcion, $estado = "Activo") {
         $this->id = $id;
         $this->id_celular = $id_celular;
         $this->id_empleado = $id_empleado;
         $this->fecha_diagnostico = $fecha_diagnostico;
         $this->descripcion = $descripcion;
+        $this->estado = $estado;
     }
 
     // Getters
@@ -26,6 +28,7 @@ class Diagnostico {
     public function getIdEmpleado() { return $this->id_empleado; }
     public function getFechaDiagnostico() { return $this->fecha_diagnostico; }
     public function getDescripcion() { return $this->descripcion; }
+    public function getEstado() { return $this->estado; }
 
     public function getCelular() { return $this->celular; }
     public function getEmpleado() { return $this->empleado; }
@@ -36,6 +39,7 @@ class Diagnostico {
     public function setIdEmpleado($id_empleado) { $this->id_empleado = $id_empleado; }
     public function setFechaDiagnostico($fecha_diagnostico) { $this->fecha_diagnostico = $fecha_diagnostico; }
     public function setDescripcion($descripcion) { $this->descripcion = $descripcion; }
+    public function setEstado($estado) { $this->estado = $estado; }
 
     public function setCelular($celular) { $this->celular = $celular; }
     public function setEmpleado($empleado) { $this->empleado = $empleado; }
@@ -47,4 +51,5 @@ class Diagnostico {
     public function setReparacion($reparacion) {
         $this->reparacion = $reparacion;
     }
+
 }

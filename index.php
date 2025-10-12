@@ -1,7 +1,7 @@
 <?php
 session_start();
 require_once "config/rutas.php";
-define("URL", "http://192.168.0.7/Reparacion_Celulares/");
+define("URL", "http://172.20.10.3/Reparacion_Celulares/");
 
 // Verifica si está logueado
 

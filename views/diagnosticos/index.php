@@ -199,6 +199,7 @@
                                         <th><i class="bi bi-calendar-event"></i> Fecha</th>
                                         <th><i class="bi bi-file-text"></i> Descripción</th>
                                         <th><i class="bi bi-ticket"></i> Ticket</th>
+                                        <th><i class="bi bi-info-circle"></i> Estado</th>
                                         <th class="text-center"><i class="bi bi-tools"></i> Acciones</th>
                                     </tr>
                                 </thead>
@@ -252,6 +253,14 @@
                                                 <?php endif; ?>
                                             </td>
                                             <td class="text-center">
+                                                <?php if ($d->getEstado() === "Activo"): ?>
+                                                    <span class="badge bg-success">Activo</span>
+                                                <?php else: ?>
+                                                    <span class="badge bg-danger">Cancelado</span>
+                                                <?php endif; ?>
+                                            </td>
+
+                                            <td class="text-center">
                                                 <div class="btn-group btn-group-sm">
                                                     <a href="index.php?page=diagnosticos&action=editar&id=<?= $d->getId() ?>" 
                                                        class="btn btn-outline-primary" 
@@ -268,6 +277,14 @@
                                                             <i class="bi bi-ticket-detailed"></i>
                                                         </a>
                                                     <?php endif; ?>
+                                                    <a href="index.php?page=diagnosticos&action=toggleEstado&id=<?= $d->getId() ?>" 
+                                                    class="btn <?= $d->getEstado() === 'Activo' ? 'btn-outline-danger' : 'btn-outline-success' ?> btn-sm" 
+                                                    data-bs-toggle="tooltip" 
+                                                    title="<?= $d->getEstado() === 'Activo' ? 'Cancelar diagnóstico' : 'Reactivar diagnóstico' ?>"
+                                                    onclick="return confirm('¿Estás seguro de que quieres <?= $d->getEstado() === 'Activo' ? 'cancelar' : 'activar' ?> este diagnóstico?');">
+                                                        <i class="bi <?= $d->getEstado() === 'Activo' ? 'bi-x-circle' : 'bi-check-circle' ?>"></i>
+                                                    </a>
+
                                                 </div>
                                             </td>
                                         </tr>
