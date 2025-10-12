@@ -177,4 +177,42 @@ class DiagnosticosController {
         header("Location: index.php?page=diagnosticos&action=index");
         exit;
     }
+
+    public function toggleEstado() {
+        $id = $_GET['id'] ?? null;
+        if (!$id) {
+            $_SESSION['error'] = "Diagnóstico no encontrado.";
+            header("Location: index.php?page=diagnosticos&action=index");
+            exit;
+        }
+
+        $diagnostico = $this->model->obtenerPorId($id);
+        if (!$diagnostico) {
+            $_SESSION['error'] = "Diagnóstico no encontrado.";
+            header("Location: index.php?page=diagnosticos&action=index");
+            exit;
+        }
+
+        // Determinar nuevo estado
+        $nuevoEstado = $diagnostico->getEstado() === "Activo" ? "Cancelado" : "Activo";
+        $diagnostico->setEstado($nuevoEstado);
+
+        $reparacion = $this->reparacionesModel->obtenerPorDiagnostico($diagnostico->getId());
+
+        // Actualizar reparación asociada si existe
+        $estadoReparacion = $nuevoEstado === "Cancelado" ? "Cancelado" : "Pendiente";
+        $this->reparacionesModel->actualizarEstadoPorDiagnostico($diagnostico->getId(), $estadoReparacion);
+
+
+
+        // Actualizar diagnóstico
+        $this->model->actualizar($diagnostico);
+
+        $_SESSION['mensaje'] = "Estado del diagnóstico actualizado correctamente.";
+        header("Location: index.php?page=diagnosticos&action=index");
+        exit;
+    }
+
+
+
 }

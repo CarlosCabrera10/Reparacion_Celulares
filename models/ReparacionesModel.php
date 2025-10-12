@@ -364,4 +364,10 @@ class ReparacionesModel {
         }
         return $reparaciones;
     }
+
+    public function actualizarEstadoPorDiagnostico($idDiagnostico, $nuevoEstado) {
+        $stmt = $this->db->prepare("UPDATE reparaciones SET estado = ? WHERE id_diagnostico = ?");
+        return $stmt->execute([$nuevoEstado, $idDiagnostico]);
+    }
+
 }
