@@ -51,7 +51,6 @@ class ReparacionesModel {
         return null;
     }
 
-    // ✅ Obtener por diagnóstico
     public function obtenerPorDiagnostico($idDiagnostico) {
         $stmt = $this->db->prepare("SELECT * FROM reparaciones WHERE id_diagnostico = ?");
         $stmt->execute([$idDiagnostico]);
@@ -68,8 +67,9 @@ class ReparacionesModel {
                 $fila['costo']
             );
         }
-        return null;
+        return null; // si no hay reparacion
     }
+
 
     // ✅ Obtener todas las reparaciones (sin joins)
     public function obtenerTodos() {

@@ -193,20 +193,25 @@ class DiagnosticosController {
             exit;
         }
 
-        // Determinar nuevo estado
-        $nuevoEstado = $diagnostico->getEstado() === "Activo" ? "Cancelado" : "Activo";
-        $diagnostico->setEstado($nuevoEstado);
-
         $reparacion = $this->reparacionesModel->obtenerPorDiagnostico($diagnostico->getId());
 
-        // Actualizar reparación asociada si existe
-        $estadoReparacion = $nuevoEstado === "Cancelado" ? "Cancelado" : "Pendiente";
-        $this->reparacionesModel->actualizarEstadoPorDiagnostico($diagnostico->getId(), $estadoReparacion);
+        // Si la reparación existe y ya está completa, no se puede cancelar
+        if ($reparacion && in_array($reparacion->getEstado(), ['Listo', 'Entregado'])) {
+            $_SESSION['error'] = "No se puede cancelar un diagnóstico con reparación ya completada.";
+            header("Location: index.php?page=diagnosticos&action=index");
+            exit;
+        }
 
-
-
-        // Actualizar diagnóstico
+        // Cambiar estado del diagnóstico
+        $nuevoEstado = $diagnostico->getEstado() === "Completado" ? "Cancelado" : "Completado";
+        $diagnostico->setEstado($nuevoEstado);
         $this->model->actualizar($diagnostico);
+
+        // Si hay reparación asociada y no está completa, actualizar su estado
+        if ($reparacion) {
+            $estadoReparacion = $nuevoEstado === "Cancelado" ? "Cancelado" : "Pendiente";
+            $this->reparacionesModel->actualizarEstadoPorDiagnostico($diagnostico->getId(), $estadoReparacion);
+        }
 
         $_SESSION['mensaje'] = "Estado del diagnóstico actualizado correctamente.";
         header("Location: index.php?page=diagnosticos&action=index");

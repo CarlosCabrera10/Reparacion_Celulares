@@ -5,7 +5,7 @@ class Diagnostico {
     private $id_empleado;
     private $fecha_diagnostico;
     private $descripcion;
-    private $estado = "Activo";
+    private $estado = "Completado";
 
     // Objetos relacionados
     private $celular;
@@ -13,7 +13,7 @@ class Diagnostico {
     private $reparacion;
 
 
-    public function __construct($id = null, $id_celular, $id_empleado, $fecha_diagnostico, $descripcion, $estado = "Activo") {
+    public function __construct($id = null, $id_celular, $id_empleado, $fecha_diagnostico, $descripcion, $estado = "Completado") {
         $this->id = $id;
         $this->id_celular = $id_celular;
         $this->id_empleado = $id_empleado;

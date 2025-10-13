@@ -81,24 +81,10 @@ class DiagnosticosModel {
             $diagnostico->getId()
         ]);
     }
-
-    public function toggleEstado(Diagnostico $diagnostico) {
-        $nuevoEstado = $diagnostico->getEstado() === 'Activo' ? 'Cancelado' : 'Activo';
-
-        // Actualizar diagnóstico
+    public function actualizarEstado($id, $nuevoEstado) {
         $stmt = $this->db->prepare("UPDATE diagnosticos SET estado=? WHERE id_diagnostico=?");
-        $stmt->execute([$nuevoEstado, $diagnostico->getId()]);
-
-        // Actualizar reparación asociada si existe
-        $reparacion = $this->reparacionesModel->obtenerPorDiagnostico($diagnostico->getId());
-        if ($reparacion) {
-            $estadoReparacion = $nuevoEstado === 'Cancelado' ? 'Cancelado' : 'Pendiente';
-            $this->reparacionesModel->actualizarEstado($reparacion->getId(), $estadoReparacion);
-        }
-
-        return $nuevoEstado;
+        return $stmt->execute([$nuevoEstado, $id]);
     }
-
 
 
     public function eliminar($id) {
