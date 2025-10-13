@@ -253,8 +253,8 @@
                                                 <?php endif; ?>
                                             </td>
                                             <td class="text-center">
-                                                <?php if ($d->getEstado() === "Activo"): ?>
-                                                    <span class="badge bg-success">Activo</span>
+                                                <?php if ($d->getEstado() === "Completado"): ?>
+                                                    <span class="badge bg-success">Completado</span>
                                                 <?php else: ?>
                                                     <span class="badge bg-danger">Cancelado</span>
                                                 <?php endif; ?>
@@ -278,11 +278,11 @@
                                                         </a>
                                                     <?php endif; ?>
                                                     <a href="index.php?page=diagnosticos&action=toggleEstado&id=<?= $d->getId() ?>" 
-                                                    class="btn <?= $d->getEstado() === 'Activo' ? 'btn-outline-danger' : 'btn-outline-success' ?> btn-sm" 
+                                                    class="btn <?= $d->getEstado() === 'Completado' ? 'btn-outline-danger' : 'btn-outline-success' ?> btn-sm" 
                                                     data-bs-toggle="tooltip" 
-                                                    title="<?= $d->getEstado() === 'Activo' ? 'Cancelar diagnóstico' : 'Reactivar diagnóstico' ?>"
-                                                    onclick="return confirm('¿Estás seguro de que quieres <?= $d->getEstado() === 'Activo' ? 'cancelar' : 'activar' ?> este diagnóstico?');">
-                                                        <i class="bi <?= $d->getEstado() === 'Activo' ? 'bi-x-circle' : 'bi-check-circle' ?>"></i>
+                                                    title="<?= $d->getEstado() === 'Completado' ? 'Cancelar diagnóstico' : 'Reactivar diagnóstico' ?>"
+                                                    onclick="return confirm('¿Estás seguro de que quieres <?= $d->getEstado() === 'Completado' ? 'cancelar' : 'activar' ?> este diagnóstico?');">
+                                                        <i class="bi <?= $d->getEstado() === 'Completado' ? 'bi-x-circle' : 'bi-check-circle' ?>"></i>
                                                     </a>
 
                                                 </div>
