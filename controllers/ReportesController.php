@@ -105,21 +105,38 @@ class ReportesController {
     public function generarMesExcel() {
         $data = $this->model->reparacionesPorMes();
 
-        header('Content-Type: text/csv; charset=utf-8');
-        header('Content-Disposition: attachment; filename="reporte_mes.csv"');
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment; filename="reporte_mes.xls"');
         header('Cache-Control: max-age=0');
 
-        $output = fopen('php://output', 'w');
+        echo '<html>';
+        echo '<head>';
+        echo '<style>';
+        echo 'table { border-collapse: collapse; width: 100%; }';
+        echo 'th, td { border: 1px solid #000; padding: 8px; text-align: center; }';
+        echo 'th { background-color: #d3d3d3; font-weight: bold; }';
+        echo 'tr:nth-child(even) { background-color: #f0f0f0; }';
+        echo 'td:first-child { text-align: left; }';
+        echo 'td:not(:first-child) { text-align: right; }';
+        echo '</style>';
+        echo '</head>';
+        echo '<body>';
+        echo '<table>';
+        echo '<tr><th>Mes</th><th>Pendientes</th><th>En Reparacion</th><th>Listos</th><th>Entregados</th></tr>';
 
-        // Encabezados
-        fputcsv($output, ['Mes', 'Pendientes', 'En Reparacion', 'Listos', 'Entregados']);
-
-        // Datos
         foreach ($data as $item) {
-            fputcsv($output, [$item['mes'], $item['pendientes'], $item['en_reparacion'], $item['listos'], $item['entregados']]);
+            echo '<tr>';
+            echo '<td>' . htmlspecialchars($item['mes']) . '</td>';
+            echo '<td>' . htmlspecialchars($item['pendientes']) . '</td>';
+            echo '<td>' . htmlspecialchars($item['en_reparacion']) . '</td>';
+            echo '<td>' . htmlspecialchars($item['listos']) . '</td>';
+            echo '<td>' . htmlspecialchars($item['entregados']) . '</td>';
+            echo '</tr>';
         }
 
-        fclose($output);
+        echo '</table>';
+        echo '</body>';
+        echo '</html>';
         exit;
     }
 
@@ -224,21 +241,36 @@ class ReportesController {
     public function generarTecnicoExcel() {
         $data = $this->model->reparacionesPorTecnico();
 
-        header('Content-Type: text/csv; charset=utf-8');
-        header('Content-Disposition: attachment; filename="reporte_tecnico.csv"');
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment; filename="reporte_tecnico.xls"');
         header('Cache-Control: max-age=0');
 
-        $output = fopen('php://output', 'w');
+        echo '<html>';
+        echo '<head>';
+        echo '<style>';
+        echo 'table { border-collapse: collapse; width: 100%; }';
+        echo 'th, td { border: 1px solid #000; padding: 8px; text-align: center; }';
+        echo 'th { background-color: #d3d3d3; font-weight: bold; }';
+        echo 'tr:nth-child(even) { background-color: #f0f0f0; }';
+        echo 'td:first-child { text-align: left; }';
+        echo 'td:not(:first-child) { text-align: right; }';
+        echo '</style>';
+        echo '</head>';
+        echo '<body>';
+        echo '<table>';
+        echo '<tr><th>Tecnico</th><th>Total</th><th>Tiempo Promedio</th></tr>';
 
-        // Encabezados
-        fputcsv($output, ['Tecnico', 'Total', 'Tiempo Promedio']);
-
-        // Datos
         foreach ($data as $item) {
-            fputcsv($output, [$item['tecnico'], $item['total'], $item['tiempo_promedio']]);
+            echo '<tr>';
+            echo '<td>' . htmlspecialchars($item['tecnico']) . '</td>';
+            echo '<td>' . htmlspecialchars($item['total']) . '</td>';
+            echo '<td>' . htmlspecialchars($item['tiempo_promedio']) . '</td>';
+            echo '</tr>';
         }
 
-        fclose($output);
+        echo '</table>';
+        echo '</body>';
+        echo '</html>';
         exit;
     }
 
@@ -383,21 +415,35 @@ class ReportesController {
     public function generarMarcaExcel() {
         $data = $this->model->reparacionesPorMarca();
 
-        header('Content-Type: text/csv; charset=utf-8');
-        header('Content-Disposition: attachment; filename="reporte_marca.csv"');
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment; filename="reporte_marca.xls"');
         header('Cache-Control: max-age=0');
 
-        $output = fopen('php://output', 'w');
+        echo '<html>';
+        echo '<head>';
+        echo '<style>';
+        echo 'table { border-collapse: collapse; width: 100%; }';
+        echo 'th, td { border: 1px solid #000; padding: 8px; text-align: center; }';
+        echo 'th { background-color: #d3d3d3; font-weight: bold; }';
+        echo 'tr:nth-child(even) { background-color: #f0f0f0; }';
+        echo 'td:first-child { text-align: left; }';
+        echo 'td:not(:first-child) { text-align: right; }';
+        echo '</style>';
+        echo '</head>';
+        echo '<body>';
+        echo '<table>';
+        echo '<tr><th>Marca</th><th>Total</th></tr>';
 
-        // Encabezados
-        fputcsv($output, ['Marca', 'Total']);
-
-        // Datos
         foreach ($data as $item) {
-            fputcsv($output, [$item['marca'], $item['total']]);
+            echo '<tr>';
+            echo '<td>' . htmlspecialchars($item['marca']) . '</td>';
+            echo '<td>' . htmlspecialchars($item['total']) . '</td>';
+            echo '</tr>';
         }
 
-        fclose($output);
+        echo '</table>';
+        echo '</body>';
+        echo '</html>';
         exit;
     }
 

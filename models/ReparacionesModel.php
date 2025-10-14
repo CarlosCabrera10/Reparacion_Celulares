@@ -73,7 +73,7 @@ class ReparacionesModel {
 
     // ✅ Obtener todas las reparaciones (sin joins)
     public function obtenerTodos() {
-        $stmt = $this->db->prepare("SELECT * FROM reparaciones");
+        $stmt = $this->db->prepare("SELECT * FROM reparaciones ORDER BY fecha_ingreso ASC");
         $stmt->execute();
         $filas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -161,17 +161,17 @@ class ReparacionesModel {
     // ✅ Obtener por técnico (todas sus reparaciones)
     public function obtenerPorTecnico($id_tecnico) {
         $stmt = $this->db->prepare("
-            SELECT r.*, 
-                d.descripcion AS descripcion, 
-                d.id_empleado AS tecnico_id, 
-                c.nombre AS cliente_nombre, 
-                cel.marca, cel.modelo, cel.imei 
-            FROM reparaciones r 
-            INNER JOIN diagnosticos d ON r.id_diagnostico = d.id_diagnostico 
-            INNER JOIN celulares cel ON d.id_celular = cel.id_celular 
-            INNER JOIN clientes c ON cel.id_cliente = c.id_cliente 
+            SELECT r.*,
+                d.descripcion AS descripcion,
+                d.id_empleado AS tecnico_id,
+                c.nombre AS cliente_nombre,
+                cel.marca, cel.modelo, cel.imei
+            FROM reparaciones r
+            INNER JOIN diagnosticos d ON r.id_diagnostico = d.id_diagnostico
+            INNER JOIN celulares cel ON d.id_celular = cel.id_celular
+            INNER JOIN clientes c ON cel.id_cliente = c.id_cliente
             WHERE d.id_empleado = ?
-            ORDER BY r.fecha_ingreso DESC
+            ORDER BY r.fecha_ingreso ASC
         ");
         $stmt->execute([$id_tecnico]);
         $filas = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -203,18 +203,18 @@ class ReparacionesModel {
 
     public function obtenerTodas() {
         $stmt = $this->db->prepare("
-            SELECT r.*, 
-                d.descripcion AS descripcion_diagnostico, 
-                d.id_empleado AS tecnico_id, 
-                c.nombre AS cliente_nombre, 
-                cel.marca, cel.modelo, cel.imei, 
+            SELECT r.*,
+                d.descripcion AS descripcion_diagnostico,
+                d.id_empleado AS tecnico_id,
+                c.nombre AS cliente_nombre,
+                cel.marca, cel.modelo, cel.imei,
                 e.nombre AS tecnico_nombre
-            FROM reparaciones r 
-            INNER JOIN diagnosticos d ON r.id_diagnostico = d.id_diagnostico 
-            INNER JOIN celulares cel ON d.id_celular = cel.id_celular 
-            INNER JOIN clientes c ON cel.id_cliente = c.id_cliente 
+            FROM reparaciones r
+            INNER JOIN diagnosticos d ON r.id_diagnostico = d.id_diagnostico
+            INNER JOIN celulares cel ON d.id_celular = cel.id_celular
+            INNER JOIN clientes c ON cel.id_cliente = c.id_cliente
             INNER JOIN empleados e ON d.id_empleado = e.id_empleado
-            ORDER BY r.fecha_ingreso DESC
+            ORDER BY r.fecha_ingreso ASC
         ");
         $stmt->execute();
         $filas = $stmt->fetchAll(PDO::FETCH_ASSOC);
