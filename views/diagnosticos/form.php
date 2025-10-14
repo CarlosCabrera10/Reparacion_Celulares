@@ -14,9 +14,11 @@
                     <label for="id_celular" class="form-label">Celular</label>
                     <select class="form-select" id="id_celular" name="id_celular" required>
                         <option value="">Seleccione un celular</option>
-                        <?php foreach ($celulares as $c): ?>
+                        <?php
+                        $preselectCelularId = $_GET['celular_id'] ?? null;
+                        foreach ($celulares as $c): ?>
                             <option value="<?= $c->getId() ?>"
-                                <?= isset($diagnostico) && $diagnostico->getIdCelular() == $c->getId() ? "selected" : "" ?>>
+                                <?= (isset($diagnostico) && $diagnostico->getIdCelular() == $c->getId()) || ($preselectCelularId && $preselectCelularId == $c->getId()) ? "selected" : "" ?>>
                                 <?= htmlspecialchars($c->getMarca() . " - " . $c->getModelo()) ?>
                             </option>
                         <?php endforeach; ?>

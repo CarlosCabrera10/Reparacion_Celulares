@@ -34,12 +34,18 @@ class CelularesModel {
 
     public function crear(Celular $celular) {
         $stmt = $this->db->prepare("INSERT INTO celulares (id_cliente, marca, modelo, imei) VALUES (?, ?, ?, ?)");
-        return $stmt->execute([
+        $ok = $stmt->execute([
             $celular->getIdCliente(),
             $celular->getMarca(),
             $celular->getModelo(),
             $celular->getImei()
         ]);
+
+        if ($ok) {
+            // Devolver id del celular creado para permitir redirecciones encadenadas
+            return $this->db->lastInsertId();
+        }
+        return false;
     }
 
     public function actualizar(Celular $celular) {

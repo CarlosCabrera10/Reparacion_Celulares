@@ -31,9 +31,30 @@ class ClientesModel {
         return $row ? new Cliente($row['id_cliente'], $row['nombre'], $row['telefono'], $row['email']) : null;
     }
 
+    // Buscar clientes por término (nombre o teléfono), devuelve array de Cliente
+    public function buscarPorTermino($termino, $limit = 10) {
+        $like = '%' . $termino . '%';
+        // Buscar por nombre, teléfono o email
+    $stmt = $this->db->prepare("SELECT * FROM clientes WHERE nombre LIKE :like OR telefono LIKE :like OR email LIKE :like LIMIT :limit");
+    $stmt->bindValue(':like', $like, PDO::PARAM_STR);
+    $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
+    $stmt->execute();
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $clientes = [];
+        foreach ($rows as $row) {
+            $clientes[] = new Cliente($row['id_cliente'], $row['nombre'], $row['telefono'], $row['email']);
+        }
+        return $clientes;
+    }
+
     public function crear(Cliente $cliente) {
         $stmt = $this->db->prepare("INSERT INTO clientes (nombre, telefono, email) VALUES (?, ?, ?)");
-        return $stmt->execute([$cliente->getNombre(), $cliente->getTelefono(), $cliente->getEmail()]);
+        $ok = $stmt->execute([$cliente->getNombre(), $cliente->getTelefono(), $cliente->getEmail()]);
+        if ($ok) {
+            // Devolver el id del cliente creado para permitir acciones encadenadas
+            return $this->db->lastInsertId();
+        }
+        return false;
     }
 
     public function actualizar(Cliente $cliente) {
